@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  alist:
+    image: xhofe/alist:latest
+    container_name: alist
+    restart: unless-stopped  # 重启策略：除非手动停止，否则始终重启容器
+    volumes: # 卷挂载
+      - /xxx:/data
+    ports: # 端口映射
+      - "5244:5244"
+    environment: # 环境变量
+      - PUID=0
+      - PGID=0
+      - UMASK=022
+      - "TZ=Asia/Shanghai"
+    network_mode: "bridge"  # 使用桥接网络模式
