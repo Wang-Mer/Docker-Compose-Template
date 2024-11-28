@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  gopeed:
+    image: liwei2633/gopeed
+    container_name: gopeed
+    restart: unless-stopped
+    volumes:  # 卷挂载
+      - /downloads:/app/Downloads
+      - ./storage:/app/storage
+    network_mode: host  # 使用主机网络模式  默认端口9999
