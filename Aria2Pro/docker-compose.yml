@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  aria2-pro:
+    image: p3terx/aria2-pro
+    container_name: aria2-pro
+    restart: unless-stopped
+    network_mode: host
+    volumes: # 卷挂载
+      - ./config:/config
+      - /Downloads:/downloads
+    environment: # 环境变量
+      - PUID=0
+      - PGID=0
+      - RPC_SECRET=haoyong  # 设置 RPC 密钥
+      - RPC_PORT=6800  # 设置 RPC 端口
+      - LISTEN_PORT=6888  # 设置监听端口
+      - IPV6_MODE=true  # 启用 IPv6 模式
+    logging: # 日志配置
+      options:
+        max-size: "1m"
+
+  ariang:
+    image: p3terx/ariang
+    container_name: ariang
+    restart: unless-stopped
+    logging: # 日志配置
+      options:
+        max-size: "1m"
+    network_mode: host
+    command: ["--port", "6880", "--ipv6"]
+
+  # 使用 http post 连接
+  # 开放  6888 6880
