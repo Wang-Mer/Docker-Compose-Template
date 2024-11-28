@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Web 服务器服务，使用 host 网络模式
+  web:
+    image: nginx:latest
+    container_name: my_nginx
+    restart: always  # 重启策略：总是重启
+    network_mode: "host"  # 设置为 host 网络模式
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # 使用自定义的 Nginx 配置文件
+      - ./html:/usr/share/nginx/html  # 将本地目录挂载到容器中，作为静态文件目录
+    depends_on:
+      - app  # 在启动 Web 服务之前，需要先启动应用服务
+
+  # 应用服务，使用 host 网络模式
+  app:
+    build: ./app  # 从本地 ./app 目录构建镜像
+    container_name: my_flask_app
+    restart: unless-stopped  # 重启策略：除非手动停止，否则始终重启容器
+    network_mode: "host"  # 设置为 host 网络模式
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    volumes:
+      - ./app:/app  # 将应用代码挂载到容器中
+    depends_on:
+      - db  # 在启动应用之前，需要先启动数据库
+
+  # 数据库服务，使用桥接网络模式（因为数据库通常不需要共享宿主机网络）
+  db:
+    image: postgres:13
+    container_name: my_postgres_db
+    restart: unless-stopped  # 重启策略：除非手动停止，否则始终重启容器 建议都设置为 一致
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=mydb
+    volumes:
+      - db_data:/var/lib/postgresql/data  # 持久化数据库数据
+    networks:
+      - app_network  # 这里保持使用自定义网络
+
+# 定义一个共享的网络（仅供 db 使用）
+networks:
+  app_network:
+    driver: bridge
+
+# 定义持久化存储卷
+volumes:
+  db_data:
+    driver: local
