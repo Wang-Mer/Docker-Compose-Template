@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  alist:
+    image: sigoden/dufs:latest
+    container_name: dufs
+    command: /data -a user:pass@/:rw  # 设置 用户名密码
+    restart: unless-stopped  # 重启策略：除非手动停止，否则始终重启容器
+    volumes: # 卷挂载
+      - /Downloads:/data:rw
+    ports: # 端口映射
+      - "5000:5000"
+    network_mode: "bridge"  # 使用桥接网络模式
